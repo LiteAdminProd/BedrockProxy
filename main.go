@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	const addr = "localhost:228"
+	const addr = "0.0.0.0:228"
 
 	status, err := minecraft.NewForeignStatusProvider(addr)
 	if err != nil {
