@@ -14,7 +14,7 @@ const LocalAddress = "localhost:20777"
 const SendToAddress = "localhost:19132"
 
 func main() {
-	status, err := minecraft.NewForeignStatusProvider(LocalAddress)
+	status, err := minecraft.NewForeignStatusProvider(SendToAddress)
 	if err != nil {
 		log.Panic(err)
 	}
