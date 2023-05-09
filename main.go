@@ -42,12 +42,13 @@ func main() {
 }
 
 func handle(header packet.Header, payload []byte, src net.Addr, dst net.Addr) {
-	log.Print(header.PacketID)
+	log.Print(src, " -> ", dst, "|", header.PacketID)
 }
 
 func handleConn(conn *minecraft.Conn, listener *minecraft.Listener) {
 	serverConn, err := minecraft.Dialer{
-		ClientData: conn.ClientData(),
+		ClientData:   conn.ClientData(),
+		IdentityData: conn.IdentityData(),
 	}.Dial("raknet", SendToAddress)
 	if err != nil {
 		panic(err)
