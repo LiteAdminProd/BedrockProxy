@@ -5,14 +5,14 @@ import (
 	"log"
 	"net"
 	"sync"
-
+	"github.com/LiteAdminProd/BedrockProxy/src"
 	"github.com/sandertv/gophertunnel/minecraft"
 	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
 )
 
 const LocalAddress = "0.0.0.0:20777"
 const SendToAddress = "0.0.0.0:228"
-const debug = true
+const debug = false
 
 func main() {
 	status, err := minecraft.NewForeignStatusProvider(SendToAddress)
@@ -45,7 +45,11 @@ func handle(header packet.Header, payload []byte, src net.Addr, dst net.Addr) {
 	if debug {
 		log.Print(src, " -> ", dst, "|", header.PacketID)
 	}
-	
+	switch header.PacketID {
+	// 0x09 is a chat message packet
+	case 9:
+		handler.ChatMessage(&payload)
+	}
 }
 
 func handleConn(conn *minecraft.Conn, listener *minecraft.Listener) {
@@ -54,23 +58,10 @@ func handleConn(conn *minecraft.Conn, listener *minecraft.Listener) {
 		IdentityData: conn.IdentityData(),
 	}.Dial("raknet", SendToAddress)
 	if err != nil {
-		panic(err)
+		log.Printf("[ERROR] %s", err)
 	}
 
-	var device string
-	const WinTitleID = "896928775"
-	const PhoneTitleID = "1739947436"
-	if conn.IdentityData().TitleID == WinTitleID {
-		device = "WIN"
-	} else if conn.IdentityData().TitleID == PhoneTitleID {
-		device = "PHONE"
-	} else {
-		device = "OTHER"
-	}
-	nick := conn.IdentityData().DisplayName
-	xuid := conn.IdentityData().XUID
-	uuid := conn.IdentityData().Identity
-	log.Printf("Player login: %s | xuid: %s | uuid: %s | device: %s", nick, xuid, uuid, device)
+	handler.LoginMessage(conn)
 
 	var g sync.WaitGroup
 	g.Add(2)
