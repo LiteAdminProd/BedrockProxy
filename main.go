@@ -10,8 +10,9 @@ import (
 	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
 )
 
-const LocalAddress = "localhost:20777"
-const SendToAddress = "localhost:19132"
+const LocalAddress = "0.0.0.0:20777"
+const SendToAddress = "0.0.0.0:228"
+const debug = true
 
 func main() {
 	status, err := minecraft.NewForeignStatusProvider(SendToAddress)
@@ -21,7 +22,6 @@ func main() {
 	listen := minecraft.ListenConfig{
 		StatusProvider:         status,
 		AuthenticationDisabled: false,
-		MaximumPlayers:         10,
 		PacketFunc:             handle,
 	}
 	listener, err := listen.Listen("raknet", LocalAddress)
@@ -42,7 +42,10 @@ func main() {
 }
 
 func handle(header packet.Header, payload []byte, src net.Addr, dst net.Addr) {
-	log.Print(src, " -> ", dst, "|", header.PacketID)
+	if debug {
+		log.Print(src, " -> ", dst, "|", header.PacketID)
+	}
+	
 }
 
 func handleConn(conn *minecraft.Conn, listener *minecraft.Listener) {
@@ -53,6 +56,22 @@ func handleConn(conn *minecraft.Conn, listener *minecraft.Listener) {
 	if err != nil {
 		panic(err)
 	}
+
+	var device string
+	const WinTitleID = "896928775"
+	const PhoneTitleID = "1739947436"
+	if conn.IdentityData().TitleID == WinTitleID {
+		device = "WIN"
+	} else if conn.IdentityData().TitleID == PhoneTitleID {
+		device = "PHONE"
+	} else {
+		device = "OTHER"
+	}
+	nick := conn.IdentityData().DisplayName
+	xuid := conn.IdentityData().XUID
+	uuid := conn.IdentityData().Identity
+	log.Printf("Player login: %s | xuid: %s | uuid: %s | device: %s", nick, xuid, uuid, device)
+
 	var g sync.WaitGroup
 	g.Add(2)
 	go func() {
