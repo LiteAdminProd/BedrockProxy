@@ -8,7 +8,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/LiteAdminProd/BedrockProxy/src"
+	handler "github.com/LiteAdminProd/BedrockProxy/src"
+	"github.com/LiteAdminProd/BedrockProxy/src/logger"
 	"github.com/sandertv/gophertunnel/minecraft"
 	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
 )
@@ -16,7 +17,10 @@ import (
 var conf Config
 
 func main() {
+	logger.Info("Loading BedrockProxy")
+	logger.Info("Loading config.json")
 	conf = LoadConfiguration()
+	logger.Info("Requesting motd from " + conf.SendToAddress)
 	status, err := minecraft.NewForeignStatusProvider(conf.SendToAddress)
 	if err != nil {
 		log.Panic(err)
@@ -26,6 +30,7 @@ func main() {
 		AuthenticationDisabled: false,
 		PacketFunc:             handle,
 	}
+	logger.Info("BedrockProxy listening on " + conf.LocalAddress)
 	listener, err := listen.Listen("raknet", conf.LocalAddress)
 	if err != nil {
 		log.Panic(err)
@@ -44,7 +49,7 @@ func main() {
 
 func handle(header packet.Header, payload []byte, src net.Addr, dst net.Addr) {
 	if conf.Debug {
-		log.Print(src, " -> ", dst, "|", header.PacketID)
+		logger.Info(src, " -> ", dst, "|", header.PacketID)
 	}
 	switch header.PacketID {
 	// 0x09 is a chat message packet
@@ -57,6 +62,15 @@ func handle(header packet.Header, payload []byte, src net.Addr, dst net.Addr) {
 		if addr.Port == src.(*net.UDPAddr).Port {
 			handler.Text(payload)
 		}
+	case 85:
+		addr, err := net.ResolveUDPAddr("udp", conf.LocalAddress)
+		if err != nil {
+			log.Panic(err)
+		}
+
+		if addr.Port == src.(*net.UDPAddr).Port {
+			handler.Transfer(payload)
+		}
 	}
 }
 
@@ -66,7 +80,7 @@ func handleConn(conn *minecraft.Conn, listener *minecraft.Listener) {
 		IdentityData: conn.IdentityData(),
 	}.Dial("raknet", conf.SendToAddress)
 	if err != nil {
-		log.Printf("[ERROR] %s", err)
+		logger.Error(err.Error())
 	}
 	handler.LoginMessage(conn)
 
@@ -74,13 +88,13 @@ func handleConn(conn *minecraft.Conn, listener *minecraft.Listener) {
 	g.Add(2)
 	go func() {
 		if err := conn.StartGame(serverConn.GameData()); err != nil {
-			panic(err)
+			logger.Error(err.Error())
 		}
 		g.Done()
 	}()
 	go func() {
 		if err := serverConn.DoSpawn(); err != nil {
-			panic(err)
+			logger.Error(err)
 		}
 		g.Done()
 	}()
@@ -133,6 +147,7 @@ func LoadConfiguration() Config {
 
 	configFile, err := os.Open(file)
 	if os.IsNotExist(err) {
+		logger.Warn("config.json not found, creating new one")
 		file, err := os.Create("config.json")
 		if err != nil {
 			log.Fatal(err)

@@ -2,8 +2,8 @@ package handler
 
 import (
 	"bytes"
-	"log"
 
+	"github.com/LiteAdminProd/BedrockProxy/src/logger"
 	"github.com/sandertv/gophertunnel/minecraft"
 	"github.com/sandertv/gophertunnel/minecraft/protocol"
 	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
@@ -24,7 +24,7 @@ func LoginMessage(conn *minecraft.Conn) {
 	xuid := conn.IdentityData().XUID
 	uuid := conn.IdentityData().Identity
 	addr := conn.RemoteAddr().String()
-	log.Printf("Player connected: %s | ip: %s | xuid: %s | uuid: %s | device: %s", nick, addr, xuid, uuid, device)
+	logger.Info("Player connected: %s | ip: %s | xuid: %s | uuid: %s | device: %s", nick, addr, xuid, uuid, device)
 }
 
 // TODO: make it works
@@ -39,9 +39,16 @@ func Text(payload []byte) {
 	case 7:
 		msg = "<" + packet.SourceName + "> " + packet.Message
 	}
-	log.Print(msg)
+	logger.Info(msg)
 }
 
 func Disconnect(conn *minecraft.Conn) {
-	log.Print("Player disconnected: " + conn.IdentityData().DisplayName)
+	logger.Info("Player disconnected: " + conn.IdentityData().DisplayName)
+}
+
+func Transfer(payload []byte) {
+	reader := protocol.NewReader(bytes.NewBuffer(payload), 0)
+	var packet packet.Transfer
+	packet.Marshal(reader)
+	logger.Info("Player transfered to", packet.Address, packet.Port)
 }
