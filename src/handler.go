@@ -24,7 +24,7 @@ func LoginMessage(conn *minecraft.Conn) {
 	xuid := conn.IdentityData().XUID
 	uuid := conn.IdentityData().Identity
 	addr := conn.RemoteAddr().String()
-	log.Printf("Player connected: %s | ip: %s | xuid: %s | uuid: %s | device: %s", addr, nick, xuid, uuid, device)
+	log.Printf("Player connected: %s | ip: %s | xuid: %s | uuid: %s | device: %s", nick, addr, xuid, uuid, device)
 }
 
 // TODO: make it works
@@ -40,4 +40,8 @@ func Text(payload []byte) {
 		msg = "<" + packet.SourceName + "> " + packet.Message
 	}
 	log.Print(msg)
+}
+
+func Disconnect(conn *minecraft.Conn) {
+	log.Print("Player disconnected: " + conn.IdentityData().DisplayName)
 }
