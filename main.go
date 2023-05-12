@@ -69,7 +69,9 @@ func handle(header packet.Header, payload []byte, src net.Addr, dst net.Addr) {
 		}
 
 		if addr.Port == src.(*net.UDPAddr).Port {
-			handler.Transfer(payload)
+			if conf.Debug {
+				handler.Transfer(payload)
+			}
 		}
 	}
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/LiteAdminProd/BedrockProxy/src/logger"
 	"github.com/sandertv/gophertunnel/minecraft"
@@ -24,7 +25,8 @@ func LoginMessage(conn *minecraft.Conn) {
 	xuid := conn.IdentityData().XUID
 	uuid := conn.IdentityData().Identity
 	addr := conn.RemoteAddr().String()
-	logger.Info("Player connected: %s | ip: %s | xuid: %s | uuid: %s | device: %s", nick, addr, xuid, uuid, device)
+	msg := fmt.Sprintf("Player connected: %s | ip: %s | xuid: %s | uuid: %s | device: %s", nick, addr, xuid, uuid, device)
+	logger.Info(msg)
 }
 
 // TODO: make it works
