@@ -91,7 +91,7 @@ func handleConn(conn *minecraft.Conn, listener *minecraft.Listener) {
 		for {
 			pk, err := conn.ReadPacket()
 			if err != nil {
-				log.Print("Player disconnected: " + conn.IdentityData().DisplayName)
+				handler.Disconnect(conn)
 				return
 			}
 			if err := serverConn.WritePacket(pk); err != nil {
