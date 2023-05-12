@@ -24,7 +24,7 @@ jobs:
     - name: Build
       run: go build -o out/BedrockProxy main.go
 
-    - name: Upload PDB files
+    - name: Upload Files
       uses: actions/upload-artifact@v3.1.2
       with:
         name: BedrockProxy
