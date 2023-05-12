@@ -1,10 +1,12 @@
 package handler
 
 import (
-	"github.com/sandertv/gophertunnel/minecraft"
-	//"github.com/sandertv/gophertunnel/minecraft/protocol"
-	//"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
+	"bytes"
 	"log"
+
+	"github.com/sandertv/gophertunnel/minecraft"
+	"github.com/sandertv/gophertunnel/minecraft/protocol"
+	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
 )
 
 func LoginMessage(conn *minecraft.Conn) {
@@ -22,17 +24,20 @@ func LoginMessage(conn *minecraft.Conn) {
 	xuid := conn.IdentityData().XUID
 	uuid := conn.IdentityData().Identity
 	addr := conn.RemoteAddr().String()
-	log.Printf("Player login: %s | ip: %s | xuid: %s | uuid: %s | device: %s", addr, nick, xuid, uuid, device)
+	log.Printf("Player connected: %s | ip: %s | xuid: %s | uuid: %s | device: %s", addr, nick, xuid, uuid, device)
 }
 
 // TODO: make it works
-func ChatMessage(payload *[]byte) {
-	// var io protocol.IO
-	// io.Bytes(payload)
-
-	// var text packet.Text
-	// text.Marshal(io)
-
-	// log.Print("Type: ", (*payload)[0])
-	// log.Print(text.Message)
+func Text(payload []byte) {
+	reader := protocol.NewReader(bytes.NewBuffer(payload), 0)
+	var packet packet.Text
+	packet.Marshal(reader)
+	var msg string
+	switch packet.TextType {
+	case 1:
+		msg = "<" + packet.SourceName + "> " + packet.Message
+	case 7:
+		msg = "<" + packet.SourceName + "> " + packet.Message
+	}
+	log.Print(msg)
 }

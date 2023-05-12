@@ -48,7 +48,14 @@ func handle(header packet.Header, payload []byte, src net.Addr, dst net.Addr) {
 	switch header.PacketID {
 	// 0x09 is a chat message packet
 	case 9:
-		handler.ChatMessage(&payload)
+		addr, err := net.ResolveUDPAddr("udp", LocalAddress)
+		if err != nil{
+			log.Panic(err)
+		}
+
+		if addr.Port == src.(*net.UDPAddr).Port {
+			handler.Text(payload)
+		}
 	}
 }
 
@@ -60,7 +67,6 @@ func handleConn(conn *minecraft.Conn, listener *minecraft.Listener) {
 	if err != nil {
 		log.Printf("[ERROR] %s", err)
 	}
-
 	handler.LoginMessage(conn)
 
 	var g sync.WaitGroup
@@ -85,6 +91,7 @@ func handleConn(conn *minecraft.Conn, listener *minecraft.Listener) {
 		for {
 			pk, err := conn.ReadPacket()
 			if err != nil {
+				log.Print("Player disconnected: " + conn.IdentityData().DisplayName)
 				return
 			}
 			if err := serverConn.WritePacket(pk); err != nil {
