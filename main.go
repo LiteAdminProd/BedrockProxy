@@ -8,7 +8,7 @@ import (
 	"os"
 	"sync"
 
-	handler "github.com/LiteAdminProd/BedrockProxy/src"
+	"github.com/LiteAdminProd/BedrockProxy/src/handler"
 	"github.com/LiteAdminProd/BedrockProxy/src/logger"
 	"github.com/sandertv/gophertunnel/minecraft"
 	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
