@@ -22,7 +22,7 @@ jobs:
         go-version: 1.19
 
     - name: Build
-      run: go build -o out/BedrockProxy main.go -v ./..
+      run: go build -o out/BedrockProxy main.go
 
     - name: Upload PDB files
       uses: actions/upload-artifact@v3.1.2
