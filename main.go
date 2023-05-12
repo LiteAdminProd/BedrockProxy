@@ -13,9 +13,10 @@ import (
 	"github.com/sandertv/gophertunnel/minecraft/protocol/packet"
 )
 
-var conf = LoadConfiguration()
+var conf Config
 
 func main() {
+	conf = LoadConfiguration()
 	status, err := minecraft.NewForeignStatusProvider(conf.SendToAddress)
 	if err != nil {
 		log.Panic(err)
