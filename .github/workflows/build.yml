@@ -5,9 +5,9 @@ name: Build
 
 on:
   push:
-    branches: [ "main", "dungeon-dev", "slaves-beta" ]
+    branches: [ "master", "dev", "beta" ]
   pull_request:
-    branches: [ "main", "dungeon-dev", "slaves-beta" ]
+    branches: [ "master", "dev", "beta" ]
     
 jobs:
   windows:
