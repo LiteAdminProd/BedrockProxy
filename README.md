@@ -2,10 +2,20 @@
 Simple GoLang proximity software for Minecraft: Bedrock Edition!
 Based on [Gophertunnel](https://github.com/Sandertv/gophertunnel)
 
-# Configuration (WIP)
+# Configuration 
+```json
+{
+    "localAddress": "0.0.0.0:19132", 
+    "sendToAddress": "0.0.0.0:19133", 
+    "debug": false
+}
 ```
-idk
-```
+**localAddress: Address to bind proxy** 
+
+**sendToAddress: Address to send packets from proxy** 
+
+**debug: Wanna debug info?** 
+
 
 # Installation
 ```
