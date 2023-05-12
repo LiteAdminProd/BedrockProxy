@@ -2,6 +2,11 @@
 Simple GoLang proximity software for Minecraft: Bedrock Edition!
 Based on [Gophertunnel](https://github.com/Sandertv/gophertunnel)
 
+# Configuration (WIP)
+```
+idk
+```
+
 # Installation
 ```
 git clone https://github.com/LiteAdminProd/BedrockProxy.git
