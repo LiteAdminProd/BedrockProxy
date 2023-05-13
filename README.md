@@ -1,5 +1,5 @@
 # BedrockProxy
-Simple GoLang proximity software for Minecraft: Bedrock Edition!
+Simple GoLang proxy software for Minecraft: Bedrock Edition!
 Based on [Gophertunnel](https://github.com/Sandertv/gophertunnel)
 
 # Configuration 
